@@ -76,6 +76,7 @@ def insert_into_tables(database, rooms, students):
     database.execute(create_table_rooms_query)
     database.execute(insert_into_students_query(students))
     database.execute(insert_into_rooms_query(rooms))
+    database.execute(create_index_query)
 
 
 def main():

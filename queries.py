@@ -44,12 +44,16 @@ def insert_into_rooms_query(values):
 # VALUES %s;
 # """
 
+create_index_query = """
+CREATE INDEX Students_room_index
+    ON Students (room);
+"""
 
 select_count_of_students_by_room_query = """
 SELECT Rooms.id, Rooms.name, COUNT(Students.id) AS StudentCount
 FROM Rooms
-LEFT JOIN Students
-    ON Rooms.id = Students.room
+         LEFT JOIN Students
+                   ON Rooms.id = Students.room
 GROUP BY Rooms.id
 ORDER BY Rooms.id;
 """
@@ -58,12 +62,12 @@ select_min_avg_age_by_room_query = """
 SELECT Rooms.id,
        Rooms.name,
        AVG((YEAR(CURRENT_DATE) - YEAR(Students.birthday)) -
-       (RIGHT(CURRENT_DATE, 5) < RIGHT(Students.birthday, 5))) AS AverageAge
+           (RIGHT(CURRENT_DATE, 5) < RIGHT(Students.birthday, 5))) AS AverageAge
 FROM Rooms
          JOIN Students
               ON Rooms.id = Students.room
 GROUP BY id
-ORDER BY AverageAge
+ORDER BY AverageAge, Rooms.id
 LIMIT 5;
 """
 
@@ -75,18 +79,18 @@ SELECT Rooms.id,
        MIN((YEAR(CURRENT_DATE) - YEAR(Students.birthday)) -
            (RIGHT(CURRENT_DATE, 5) < RIGHT(Students.birthday, 5))) AS AgeDifference
 FROM Rooms
-         JOIN Students
-              ON Rooms.id = Students.room
-GROUP BY id
-ORDER BY AgeDifference DESC
+         LEFT JOIN Students
+                   ON Rooms.id = Students.room
+GROUP BY Rooms.id
+ORDER BY AgeDifference DESC, Rooms.id
 LIMIT 5;
 """
 
 select_rooms_by_with_different_sexes_query = """
 SELECT Rooms.id, Rooms.name
 FROM Rooms
-LEFT JOIN Students
-    ON Rooms.id = Students.room
+         LEFT JOIN Students
+                   ON Rooms.id = Students.room
 GROUP BY Rooms.id
 HAVING COUNT(DISTINCT Students.sex) = 2;
 """
